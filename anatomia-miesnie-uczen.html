@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Mięśnie Mimiczne – Ćwiczenie</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0d14;
+    --surface: #16161f;
+    --card: #1e1e2e;
+    --accent: #ff6b35;
+    --accent2: #ffd166;
+    --text: #f0eefc;
+    --muted: #8888aa;
+    --border: #2a2a3e;
+    --success: #06d6a0;
+    --radius: 16px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  /* ── HEADER ── */
+  header {
+    width: 100%;
+    padding: 18px 24px 14px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+  }
+  .logo-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--accent); flex-shrink: 0; animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{ box-shadow:0 0 0 0 rgba(255,107,53,.5)} 50%{ box-shadow:0 0 0 8px rgba(255,107,53,0)} }
+  header h1 { font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 800; letter-spacing: .5px; }
+  header span { font-size: 12px; color: var(--muted); margin-left: auto; }
+
+  /* ── SCREENS ── */
+  .screen { display: none; flex-direction: column; align-items: center; width: 100%; max-width: 480px; padding: 28px 20px; gap: 24px; animation: fadeIn .4s ease; }
+  .screen.active { display: flex; }
+  @keyframes fadeIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+
+  /* ── INTRO ── */
+  #screen-intro { justify-content: center; min-height: 85vh; text-align: center; gap: 20px; }
+  .big-emoji { font-size: 80px; line-height: 1; }
+  #screen-intro h2 { font-family: 'Syne', sans-serif; font-size: 28px; font-weight: 800; line-height: 1.2; }
+  #screen-intro p { color: var(--muted); font-size: 15px; line-height: 1.6; max-width: 320px; }
+
+  /* ── NAME ── */
+  .field-label { font-size: 13px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; align-self: flex-start; }
+  input[type="text"] {
+    width: 100%; padding: 16px 18px;
+    background: var(--card); border: 1.5px solid var(--border); border-radius: var(--radius);
+    color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 17px;
+    outline: none; transition: border-color .2s;
+  }
+  input[type="text"]:focus { border-color: var(--accent); }
+  input[type="text"]::placeholder { color: var(--muted); }
+
+  /* ── BUTTON ── */
+  .btn {
+    width: 100%; padding: 17px; border: none; border-radius: var(--radius);
+    font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 700; cursor: pointer;
+    transition: transform .15s, box-shadow .15s; letter-spacing: .3px;
+  }
+  .btn:active { transform: scale(.97); }
+  .btn-primary { background: var(--accent); color: #fff; box-shadow: 0 4px 24px rgba(255,107,53,.35); }
+  .btn-primary:hover { box-shadow: 0 6px 32px rgba(255,107,53,.5); }
+  .btn-secondary { background: var(--card); color: var(--text); border: 1.5px solid var(--border); }
+  .btn-sm { padding: 11px 20px; font-size: 14px; width: auto; border-radius: 10px; }
+
+  /* ── EMOTION CARD ── */
+  .emotion-card {
+    width: 100%; background: var(--card); border-radius: 20px;
+    border: 1.5px solid var(--border); padding: 32px 24px;
+    display: flex; flex-direction: column; align-items: center; gap: 12px;
+    position: relative; overflow: hidden;
+  }
+  .emotion-card::before {
+    content: ''; position: absolute; top: -40px; right: -40px;
+    width: 140px; height: 140px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,107,53,.15), transparent 70%);
+  }
+  .emotion-emoji { font-size: 88px; line-height: 1; }
+  .emotion-name { font-family: 'Syne', sans-serif; font-size: 26px; font-weight: 800; text-align: center; }
+  .emotion-hint { font-size: 13px; color: var(--muted); text-align: center; }
+  .round-badge {
+    position: absolute; top: 14px; left: 14px;
+    background: var(--accent); color: #fff;
+    font-family: 'Syne', sans-serif; font-size: 11px; font-weight: 700;
+    padding: 4px 10px; border-radius: 20px; letter-spacing: .5px;
+  }
+
+  /* ── CAMERA ── */
+  .camera-wrap {
+    width: 100%; aspect-ratio: 3/4; background: var(--card);
+    border-radius: 20px; border: 1.5px solid var(--border);
+    overflow: hidden; position: relative; display: flex;
+    align-items: center; justify-content: center;
+  }
+  .camera-wrap video, .camera-wrap canvas, .camera-wrap img {
+    width: 100%; height: 100%; object-fit: cover; border-radius: 18px;
+  }
+  .camera-overlay {
+    position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+    flex-direction: column; gap: 12px; background: rgba(13,13,20,.6); backdrop-filter: blur(4px);
+  }
+  .camera-overlay p { font-size: 14px; color: var(--muted); }
+  #preview-img { display: none; width: 100%; height: 100%; object-fit: cover; border-radius: 18px; }
+  .shutter-row { display: flex; gap: 12px; justify-content: center; width: 100%; }
+  .shutter-btn {
+    width: 68px; height: 68px; border-radius: 50%; border: 3px solid var(--accent);
+    background: var(--card); cursor: pointer; display: flex; align-items: center; justify-content: center;
+    transition: transform .15s, background .15s; flex-shrink: 0;
+  }
+  .shutter-btn:active { transform: scale(.9); background: var(--accent); }
+  .shutter-inner { width: 52px; height: 52px; border-radius: 50%; background: var(--accent); }
+
+  /* ── MUSCLES LIST ── */
+  .section-title { font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; align-self: flex-start; }
+
+  .muscles-grid { display: flex; flex-direction: column; gap: 8px; width: 100%; }
+  .muscle-item {
+    display: flex; align-items: flex-start; gap: 14px;
+    background: var(--card); border: 1.5px solid var(--border); border-radius: 12px;
+    padding: 14px 16px; cursor: pointer; transition: border-color .2s, background .2s;
+    position: relative;
+  }
+  .muscle-item.selected { border-color: var(--accent); background: rgba(255,107,53,.08); }
+  .muscle-item.correct-answer { border-color: var(--success); background: rgba(6,214,160,.08); }
+  .muscle-check {
+    width: 22px; height: 22px; border-radius: 6px; border: 2px solid var(--border);
+    flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+    transition: border-color .2s, background .2s; margin-top: 1px;
+  }
+  .muscle-item.selected .muscle-check { border-color: var(--accent); background: var(--accent); }
+  .muscle-item.correct-answer .muscle-check { border-color: var(--success); background: var(--success); }
+  .muscle-check svg { width: 13px; height: 13px; opacity: 0; transition: opacity .2s; }
+  .muscle-item.selected .muscle-check svg, .muscle-item.correct-answer .muscle-check svg { opacity: 1; }
+  .muscle-info { flex: 1; }
+  .muscle-name { font-weight: 500; font-size: 15px; line-height: 1.3; }
+  .muscle-latin { font-size: 12px; color: var(--muted); font-style: italic; margin-top: 2px; }
+  .muscle-zone { font-size: 11px; color: var(--accent2); margin-top: 4px; font-weight: 500; }
+
+  /* ── PROGRESS BAR ── */
+  .progress-bar { width: 100%; height: 4px; background: var(--border); border-radius: 2px; }
+  .progress-fill { height: 100%; background: var(--accent); border-radius: 2px; transition: width .5s ease; }
+
+  /* ── SUCCESS ── */
+  #screen-done { justify-content: center; min-height: 80vh; text-align: center; gap: 20px; }
+  .done-icon { font-size: 72px; }
+  #screen-done h2 { font-family: 'Syne', sans-serif; font-size: 26px; font-weight: 800; }
+  #screen-done p { color: var(--muted); font-size: 15px; line-height: 1.6; }
+
+  /* ── DIVIDER ── */
+  .divider { width: 100%; height: 1px; background: var(--border); }
+
+  /* ── TOAST ── */
+  .toast {
+    position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(80px);
+    background: var(--success); color: #0d0d14; padding: 12px 24px; border-radius: 40px;
+    font-family: 'Syne', sans-serif; font-weight: 700; font-size: 14px;
+    transition: transform .3s ease; z-index: 999; white-space: nowrap;
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+
+  .error-msg { color: var(--accent); font-size: 13px; align-self: flex-start; }
+
+  video { transform: scaleX(-1); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo-dot"></div>
+  <h1>Mięśnie Mimiczne</h1>
+  <span id="header-info">Krok 1 / 3</span>
+</header>
+
+<!-- SCREEN 1: INTRO + NAME -->
+<div class="screen active" id="screen-intro">
+  <div class="big-emoji">🧠</div>
+  <h2>Ćwiczenie z anatomii</h2>
+  <p>Zobaczysz emotikon, zrobisz taką samą minę i wybierzesz mięśnie, które jej używasz.</p>
+  <div class="divider"></div>
+  <span class="field-label">Twoje imię i nazwisko</span>
+  <input type="text" id="student-name" placeholder="np. Anna Kowalska" autocomplete="name" />
+  <span class="error-msg" id="name-error" style="display:none">Wpisz swoje imię, żeby kontynuować.</span>
+  <button class="btn btn-primary" onclick="startExercise()">Zacznij ćwiczenie →</button>
+</div>
+
+<!-- SCREEN 2: EXERCISE -->
+<div class="screen" id="screen-exercise">
+  <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+
+  <div class="emotion-card">
+    <div class="round-badge" id="round-label">1 / 7</div>
+    <div class="emotion-emoji" id="emotion-emoji">😠</div>
+    <div class="emotion-name" id="emotion-name">Złość</div>
+    <div class="emotion-hint" id="emotion-hint">Zrób taką samą minę i zrób zdjęcie selfie!</div>
+  </div>
+
+  <!-- CAMERA -->
+  <div class="camera-wrap" id="camera-wrap">
+    <video id="video" autoplay playsinline muted></video>
+    <canvas id="canvas" style="display:none"></canvas>
+    <img id="preview-img" alt="Twoje zdjęcie" />
+    <div class="camera-overlay" id="cam-overlay">
+      <p>📷 Potrzebny dostęp do kamery</p>
+      <button class="btn btn-primary btn-sm" onclick="startCamera()">Włącz kamerę</button>
+    </div>
+  </div>
+
+  <div class="shutter-row" id="shutter-row" style="display:none">
+    <button class="shutter-btn" id="shutter-btn" onclick="takeSelfie()" title="Zrób zdjęcie">
+      <div class="shutter-inner"></div>
+    </button>
+  </div>
+  <div style="display:none" id="retake-row">
+    <button class="btn btn-secondary btn-sm" onclick="retakeSelfie()">🔄 Zrób ponownie</button>
+  </div>
+
+  <!-- MUSCLES -->
+  <span class="section-title" id="muscles-label" style="display:none">Które mięśnie pracują? (wybierz wszystkie)</span>
+  <div class="muscles-grid" id="muscles-grid"></div>
+
+  <button class="btn btn-primary" id="btn-next" style="display:none" onclick="nextRound()">Dalej →</button>
+</div>
+
+<!-- SCREEN 3: DONE -->
+<div class="screen" id="screen-done">
+  <div class="done-icon">🎉</div>
+  <h2>Brawo!</h2>
+  <p>Twoje odpowiedzi zostały zapisane.<br>Poczekaj aż nauczyciel wyświetli wyniki na tablicy.</p>
+  <div style="background:var(--card);border-radius:var(--radius);padding:20px;width:100%;text-align:left;border:1.5px solid var(--border)">
+    <div style="font-size:13px;color:var(--muted);margin-bottom:8px;font-family:'Syne',sans-serif;text-transform:uppercase;letter-spacing:.5px">Twój wynik</div>
+    <div id="score-display" style="font-family:'Syne',sans-serif;font-size:32px;font-weight:800;color:var(--accent)"></div>
+    <div id="score-label" style="font-size:14px;color:var(--muted);margin-top:4px"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast">✓ Zapisano!</div>
+
+<script>
+// ─── DATA ───────────────────────────────────────────────────────────────
+const EMOTIONS = [
+  {
+    emoji: "😠", name: "Złość", hint: "Zmarszcz brwi, napnij szczękę!",
+    muscles: [
+      { name: "Mięsień marszczący brwi", latin: "m. corrugator supercilii", zone: "Okolica brwi", correct: true },
+      { name: "Mięsień okrężny oka", latin: "m. orbicularis oculi", zone: "Powieki / okolica oka", correct: true },
+      { name: "Mięsień podnosiciel górnej wargi", latin: "m. levator labii superioris", zone: "Policzek", correct: false },
+      { name: "Mięsień szeroki szyi", latin: "m. platysma", zone: "Szyja / dolna twarz", correct: true },
+      { name: "Mięsień jarzmowy większy", latin: "m. zygomaticus major", zone: "Policzek", correct: false },
+    ]
+  },
+  {
+    emoji: "😊", name: "Radość", hint: "Uśmiechnij się szeroko!",
+    muscles: [
+      { name: "Mięsień jarzmowy większy", latin: "m. zygomaticus major", zone: "Policzek → kąt ust", correct: true },
+      { name: "Mięsień jarzmowy mniejszy", latin: "m. zygomaticus minor", zone: "Policzek górny", correct: true },
+      { name: "Mięsień śmiechowy", latin: "m. risorius", zone: "Kąt ust → policzek", correct: true },
+      { name: "Mięsień okrężny oka", latin: "m. orbicularis oculi", zone: "Powieki", correct: true },
+      { name: "Mięsień marszczący brwi", latin: "m. corrugator supercilii", zone: "Okolica brwi", correct: false },
+    ]
+  },
+  {
+    emoji: "😢", name: "Smutek", hint: "Opuść kąciki ust, zmarszcz nos!",
+    muscles: [
+      { name: "Mięsień obniżający kąt ust", latin: "m. depressor anguli oris", zone: "Kąt ust → żuchwa", correct: true },
+      { name: "Mięsień bródkowy", latin: "m. mentalis", zone: "Bródka", correct: true },
+      { name: "Mięsień marszczący brwi", latin: "m. corrugator supercilii", zone: "Okolica brwi", correct: true },
+      { name: "Mięsień czoła", latin: "m. frontalis", zone: "Czoło (część przyśrodkowa)", correct: true },
+      { name: "Mięsień jarzmowy większy", latin: "m. zygomaticus major", zone: "Policzek", correct: false },
+    ]
+  },
+  {
+    emoji: "😮", name: "Zdziwienie", hint: "Unieś brwi, otwórz usta szeroko!",
+    muscles: [
+      { name: "Mięsień czoła", latin: "m. frontalis", zone: "Czoło", correct: true },
+      { name: "Mięsień okrężny oka", latin: "m. orbicularis oculi", zone: "Powieki (rozkurcz)", correct: true },
+      { name: "Mięsień okrężny ust", latin: "m. orbicularis oris", zone: "Usta (rozkurcz)", correct: true },
+      { name: "Mięsień żwacz", latin: "m. masseter", zone: "Policzek / żuchwa", correct: true },
+      { name: "Mięsień śmiechowy", latin: "m. risorius", zone: "Policzek", correct: false },
+    ]
+  },
+  {
+    emoji: "🤢", name: "Wstręt", hint: "Zmarszcz nos i górną wargę!",
+    muscles: [
+      { name: "Mięsień nosowy", latin: "m. nasalis", zone: "Nos (marszczenie)", correct: true },
+      { name: "Mięsień dźwigacz wargi górnej i skrzydła nosa", latin: "m. levator labii sup. alaeque nasi", zone: "Nos → warga górna", correct: true },
+      { name: "Mięsień podnosiciel górnej wargi", latin: "m. levator labii superioris", zone: "Policzek → warga", correct: true },
+      { name: "Mięsień jarzmowy większy", latin: "m. zygomaticus major", zone: "Policzek", correct: false },
+      { name: "Mięsień okrężny ust", latin: "m. orbicularis oris", zone: "Usta", correct: true },
+    ]
+  },
+  {
+    emoji: "😨", name: "Strach", hint: "Unieś brwi, szeroko otwórz oczy i usta!",
+    muscles: [
+      { name: "Mięsień czoła", latin: "m. frontalis", zone: "Czoło", correct: true },
+      { name: "Mięsień okrężny oka", latin: "m. orbicularis oculi", zone: "Powieki (rozkurcz)", correct: true },
+      { name: "Mięsień szeroki szyi", latin: "m. platysma", zone: "Szyja / dolna twarz", correct: true },
+      { name: "Mięsień okrężny ust", latin: "m. orbicularis oris", zone: "Usta (rozkurcz)", correct: true },
+      { name: "Mięsień marszczący brwi", latin: "m. corrugator supercilii", zone: "Brwi (marszczenie)", correct: false },
+    ]
+  },
+  {
+    emoji: "🧐", name: "Skupienie", hint: "Zmrużruj jedno oko i zmarszcz brwi!",
+    muscles: [
+      { name: "Mięsień marszczący brwi", latin: "m. corrugator supercilii", zone: "Okolica brwi", correct: true },
+      { name: "Mięsień okrężny oka", latin: "m. orbicularis oculi", zone: "Powieki (zmrużenie)", correct: true },
+      { name: "Mięsień podnosiciel górnej wargi", latin: "m. levator labii superioris", zone: "Policzek", correct: false },
+      { name: "Mięsień czoła", latin: "m. frontalis", zone: "Czoło", correct: false },
+      { name: "Mięsień jarzmowy mniejszy", latin: "m. zygomaticus minor", zone: "Policzek górny", correct: false },
+    ]
+  }
+];
+
+// ─── STATE ───────────────────────────────────────────────────────────────
+let studentName = '';
+let currentRound = 0;
+let stream = null;
+let photoTaken = false;
+let photoDataUrl = '';
+let selectedMuscles = new Set();
+let results = [];
+let totalCorrect = 0;
+
+// ─── HELPERS ─────────────────────────────────────────────────────────────
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ─── INTRO ────────────────────────────────────────────────────────────────
+function startExercise() {
+  const inp = document.getElementById('student-name');
+  studentName = inp.value.trim();
+  if (!studentName) {
+    document.getElementById('name-error').style.display = 'block';
+    inp.focus(); return;
+  }
+  document.getElementById('name-error').style.display = 'none';
+  showScreen('screen-exercise');
+  loadRound(0);
+}
+
+// ─── ROUND ────────────────────────────────────────────────────────────────
+function loadRound(index) {
+  currentRound = index;
+  const e = EMOTIONS[index];
+  photoTaken = false;
+  photoDataUrl = '';
+  selectedMuscles = new Set();
+
+  document.getElementById('header-info').textContent = `Krok 2 / 3`;
+  document.getElementById('progress-fill').style.width = (index / EMOTIONS.length * 100) + '%';
+  document.getElementById('round-label').textContent = `${index + 1} / ${EMOTIONS.length}`;
+  document.getElementById('emotion-emoji').textContent = e.emoji;
+  document.getElementById('emotion-name').textContent = e.name;
+  document.getElementById('emotion-hint').textContent = e.hint;
+
+  // Reset camera UI
+  document.getElementById('preview-img').style.display = 'none';
+  document.getElementById('preview-img').src = '';
+  const video = document.getElementById('video');
+  video.style.display = 'block';
+
+  document.getElementById('muscles-label').style.display = 'none';
+  document.getElementById('muscles-grid').style.display = 'none';
+  document.getElementById('muscles-grid').innerHTML = '';
+  document.getElementById('btn-next').style.display = 'none';
+  document.getElementById('retake-row').style.display = 'none';
+
+  // Shuffle muscles
+  const shuffled = [...e.muscles].sort(() => Math.random() - .5);
+  shuffled.forEach((m, i) => {
+    const div = document.createElement('div');
+    div.className = 'muscle-item';
+    div.dataset.index = i;
+    div.dataset.correct = m.correct;
+    div.innerHTML = `
+      <div class="muscle-check">
+        <svg viewBox="0 0 13 10" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="1,5 4.5,8.5 11,1"/>
+        </svg>
+      </div>
+      <div class="muscle-info">
+        <div class="muscle-name">${m.name}</div>
+        <div class="muscle-latin">${m.latin}</div>
+        <div class="muscle-zone">📍 ${m.zone}</div>
+      </div>`;
+    div.onclick = () => toggleMuscle(div);
+    document.getElementById('muscles-grid').appendChild(div);
+  });
+
+  // Try to reuse existing camera stream
+  if (stream) {
+    video.srcObject = stream;
+    document.getElementById('cam-overlay').style.display = 'none';
+    document.getElementById('shutter-row').style.display = 'flex';
+  }
+}
+
+// ─── CAMERA ──────────────────────────────────────────────────────────────
+async function startCamera() {
+  try {
+    stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: false });
+    const video = document.getElementById('video');
+    video.srcObject = stream;
+    document.getElementById('cam-overlay').style.display = 'none';
+    document.getElementById('shutter-row').style.display = 'flex';
+  } catch(err) {
+    alert('Nie udało się uruchomić kamery. Sprawdź uprawnienia w przeglądarce.');
+  }
+}
+
+function takeSelfie() {
+  const video = document.getElementById('video');
+  const canvas = document.getElementById('canvas');
+  canvas.width = video.videoWidth || 640;
+  canvas.height = video.videoHeight || 480;
+  const ctx = canvas.getContext('2d');
+  ctx.save(); ctx.translate(canvas.width, 0); ctx.scale(-1, 1);
+  ctx.drawImage(video, 0, 0);
+  ctx.restore();
+
+  photoDataUrl = canvas.toDataURL('image/jpeg', 0.75);
+  photoTaken = true;
+
+  const img = document.getElementById('preview-img');
+  img.src = photoDataUrl;
+  img.style.display = 'block';
+  video.style.display = 'none';
+  document.getElementById('shutter-row').style.display = 'none';
+  document.getElementById('retake-row').style.display = 'flex';
+
+  // Show muscles
+  document.getElementById('muscles-label').style.display = 'block';
+  document.getElementById('muscles-grid').style.display = 'flex';
+  document.getElementById('btn-next').style.display = 'block';
+}
+
+function retakeSelfie() {
+  const video = document.getElementById('video');
+  video.style.display = 'block';
+  document.getElementById('preview-img').style.display = 'none';
+  document.getElementById('shutter-row').style.display = 'flex';
+  document.getElementById('retake-row').style.display = 'none';
+  document.getElementById('muscles-label').style.display = 'none';
+  document.getElementById('muscles-grid').style.display = 'none';
+  document.getElementById('btn-next').style.display = 'none';
+  photoTaken = false;
+  selectedMuscles = new Set();
+  document.querySelectorAll('.muscle-item').forEach(el => el.classList.remove('selected'));
+}
+
+// ─── MUSCLES ─────────────────────────────────────────────────────────────
+function toggleMuscle(el) {
+  const idx = el.dataset.index;
+  if (selectedMuscles.has(idx)) { selectedMuscles.delete(idx); el.classList.remove('selected'); }
+  else { selectedMuscles.add(idx); el.classList.add('selected'); }
+}
+
+// ─── NEXT ROUND ──────────────────────────────────────────────────────────
+function nextRound() {
+  if (!photoTaken) { showToast('📷 Najpierw zrób zdjęcie!'); return; }
+
+  // Calculate score for this round
+  const e = EMOTIONS[currentRound];
+  const shuffled = Array.from(document.querySelectorAll('.muscle-item'));
+  let correct = 0, total = e.muscles.filter(m => m.correct).length;
+  shuffled.forEach(el => {
+    const isCorrect = el.dataset.correct === 'true';
+    const isSelected = el.classList.contains('selected');
+    if (isCorrect && isSelected) correct++;
+    if (isCorrect) el.classList.add('correct-answer');
+  });
+  if (correct === total) totalCorrect++;
+
+  // Save result
+  results.push({
+    emotion: e.name, emoji: e.emoji, photo: photoDataUrl,
+    selected: Array.from(selectedMuscles),
+    correct, total, score: Math.round(correct / total * 100)
+  });
+
+  // Save to localStorage for teacher board
+  saveToStorage();
+  showToast(`✓ Zapisano! ${correct}/${total} trafień`);
+
+  setTimeout(() => {
+    if (currentRound + 1 < EMOTIONS.length) {
+      loadRound(currentRound + 1);
+    } else {
+      finishExercise();
+    }
+  }, 1200);
+}
+
+function saveToStorage() {
+  try {
+    const key = 'anatomy_results';
+    let all = JSON.parse(localStorage.getItem(key) || '[]');
+    const existing = all.findIndex(r => r.name === studentName);
+    const entry = { name: studentName, timestamp: Date.now(), results, totalCorrect, total: EMOTIONS.length };
+    if (existing >= 0) all[existing] = entry; else all.push(entry);
+    localStorage.setItem(key, JSON.stringify(all));
+  } catch(e) {}
+}
+
+function finishExercise() {
+  if (stream) { stream.getTracks().forEach(t => t.stop()); stream = null; }
+  document.getElementById('header-info').textContent = 'Gotowe!';
+  document.getElementById('score-display').textContent = `${totalCorrect} / ${EMOTIONS.length}`;
+  const pct = Math.round(totalCorrect / EMOTIONS.length * 100);
+  const labels = ['Świetna robota! 🏆', 'Bardzo dobrze! ⭐', 'Dobrze! 👍', 'Ćwicz dalej! 💪'];
+  document.getElementById('score-label').textContent = pct >= 86 ? labels[0] : pct >= 71 ? labels[1] : pct >= 57 ? labels[2] : labels[3];
+  showScreen('screen-done');
+}
+</script>
+</body>
+</html>

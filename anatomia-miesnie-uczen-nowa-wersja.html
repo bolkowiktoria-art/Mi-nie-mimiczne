@@ -333,14 +333,14 @@ const EMOTIONS = [
       { name: "Mięsień obniżający kąt ust", latin: "m. depressor anguli oris", zone: "Kąt ust → żuchwa", correct: true },
       { name: "Mięsień bródkowy", latin: "m. mentalis", zone: "Bródka", correct: true },
       { name: "Mięsień marszczący brwi", latin: "m. corrugator supercilii", zone: "Okolica brwi", correct: true },
-      { name: "Mięsień czoła", latin: "m. frontalis", zone: "Czoło (część przyśrodkowa)", correct: true },
+      { name: "Mięsień czołowo-potyliczny", latin: "m. occipitofrontalis", zone: "Czoło (część przyśrodkowa)", correct: true },
       { name: "Mięsień jarzmowy większy", latin: "m. zygomaticus major", zone: "Policzek", correct: false },
     ]
   },
   {
     emoji: "😮", name: "Zdziwienie", hint: "Unieś brwi, otwórz usta szeroko!",
     muscles: [
-      { name: "Mięsień czoła", latin: "m. frontalis", zone: "Czoło", correct: true },
+      { name: "Mięsień czołowo-potyliczny", latin: "m. occipitofrontalis", zone: "Czoło", correct: true },
       { name: "Mięsień okrężny oka", latin: "m. orbicularis oculi", zone: "Powieki (rozkurcz)", correct: true },
       { name: "Mięsień okrężny ust", latin: "m. orbicularis oris", zone: "Usta (rozkurcz)", correct: true },
       { name: "Mięsień obniżający kąt ust", latin: "m. depressor anguli oris", zone: "Kąt ust", correct: false },
@@ -360,7 +360,7 @@ const EMOTIONS = [
   {
     emoji: "😨", name: "Strach", hint: "Unieś brwi, szeroko otwórz oczy i usta!",
     muscles: [
-      { name: "Mięsień czoła", latin: "m. frontalis", zone: "Czoło", correct: true },
+      { name: "Mięsień czołowo-potyliczny", latin: "m. occipitofrontalis", zone: "Czoło", correct: true },
       { name: "Mięsień okrężny oka", latin: "m. orbicularis oculi", zone: "Powieki (rozkurcz)", correct: true },
       { name: "Mięsień okrężny ust", latin: "m. orbicularis oris", zone: "Usta (rozkurcz)", correct: true },
       { name: "Mięsień marszczący brwi", latin: "m. corrugator supercilii", zone: "Brwi", correct: false },
@@ -373,7 +373,7 @@ const EMOTIONS = [
       { name: "Mięsień marszczący brwi", latin: "m. corrugator supercilii", zone: "Okolica brwi", correct: true },
       { name: "Mięsień okrężny oka", latin: "m. orbicularis oculi", zone: "Powieki (zmrużenie)", correct: true },
       { name: "Mięsień podnosiciel górnej wargi", latin: "m. levator labii superioris", zone: "Policzek", correct: false },
-      { name: "Mięsień czoła", latin: "m. frontalis", zone: "Czoło", correct: false },
+      { name: "Mięsień czołowo-potyliczny", latin: "m. occipitofrontalis", zone: "Czoło", correct: false },
       { name: "Mięsień jarzmowy mniejszy", latin: "m. zygomaticus minor", zone: "Policzek górny", correct: false },
     ]
   }
@@ -555,17 +555,16 @@ function nextRound() {
     correct, total, score: Math.round(correct / total * 100)
   });
 
-  // Save to localStorage for teacher board
-  saveToStorage();
-  showToast(`✓ Zapisano! ${correct}/${total} trafień`);
+  showToast(`✓ ${correct}/${total} trafień`);
 
+  const isLast = currentRound + 1 >= EMOTIONS.length;
   setTimeout(() => {
-    if (currentRound + 1 < EMOTIONS.length) {
+    if (!isLast) {
       loadRound(currentRound + 1);
     } else {
       finishExercise();
     }
-  }, 1200);
+  }, 1000);
 }
 
 function saveToStorage() {
